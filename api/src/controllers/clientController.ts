@@ -16,8 +16,23 @@ type ClientType = {
   saved_properties: string[] | null;
   interested_properties: string[] | null;
 };
+function isClientType(obj): obj is ClientType {
+  return (
+    typeof obj._id === "string" &&
+    typeof obj.firstName === "string" &&
+    typeof obj.lastName === "string" &&
+    typeof obj.contact_no === "string" &&
+    typeof obj.email === "string" &&
+    typeof obj.password === "string"
+  );
+}
 
-export async function clientCreation(req: { body: ClientType }, res: Response) {
+type ClientCreationReq = Request & { body: ClientType };
+export async function clientCreation(req: ClientCreationReq, res: Response) {
+  if (!isClientType(req.body)) {
+    res.status(400).send();
+    return;
+  }
   const hashedPassword = cryptojs
     .SHA256(req.body.password)
     .toString(cryptojs.enc.Base64);
@@ -45,7 +60,8 @@ export async function clientCreation(req: { body: ClientType }, res: Response) {
   res.status(201).json({ token });
 }
 
-export async function getClientInfo(req: { query: { clientId: string } }, res) {
+type ClientInfoReq = Request & { query: { clientId: string } };
+export async function getClientInfo(req: ClientInfoReq, res: Response) {
   const client = await Client.findById(req.query.clientId);
 
   if (!client) {

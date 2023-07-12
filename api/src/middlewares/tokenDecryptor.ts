@@ -5,7 +5,7 @@ const JWT_KEY = process.env.JWT_KEY || "key";
 
 export default function tokenDecryptor(
   req: Request,
-  res: Response,
+  _res: Response,
   next: NextFunction
 ) {
   const bearerToken = req.headers.authorization;
