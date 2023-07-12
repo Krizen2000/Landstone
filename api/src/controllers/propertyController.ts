@@ -1,5 +1,5 @@
 import Property from "../models/Property";
-import { Response } from "express";
+import { Request, Response } from "express";
 
 type PropertyType = {
   agentId: string;
@@ -17,7 +17,7 @@ type PropertyType = {
 };
 
 export async function propertyCreation(
-  req: { body: PropertyType; user: { agentId: string } },
+  req: Request & { body: PropertyType; user: { agentId: string } },
   res: Response
 ) {
   const matchProperty = await Property.findOne({
@@ -37,10 +37,13 @@ export async function propertyCreation(
 }
 
 export async function getPropertyInfo(
-  req: { body: { propertyId: string }; user: { agentId: string } | null },
+  req: Request & {
+    query: { propertyId: string };
+    user: { agentId: string } | null;
+  },
   res: Response
 ) {
-  const property = await Property.findById(req.body.propertyId);
+  const property = await Property.findById(req.query.propertyId);
   if (!property) {
     res.status(404).send();
     return;
@@ -54,7 +57,9 @@ export async function getPropertyInfo(
     res.status(200).json(property);
     return;
   }
-  await Property.findByIdAndUpdate(req.body.propertyId, { $inc: { views: 1 } });
+  await Property.findByIdAndUpdate(req.query.propertyId, {
+    $inc: { views: 1 },
+  });
   res.status(200).json(property);
 }
 
@@ -65,7 +70,7 @@ type UpdateProperyReq = Request & {
   body: Partial<PropertyType>;
   user: { agentId: string };
 };
-export async function updatePropertyInfo(req: UpdateProperyReq, res) {
+export async function updatePropertyInfo(req: UpdateProperyReq, res: Response) {
   const property = await Property.findById(req.params.propertyId);
   if ((property?.agentId ?? "") !== req.user.agentId) {
     res.status(400).send();
@@ -77,7 +82,7 @@ export async function updatePropertyInfo(req: UpdateProperyReq, res) {
 }
 
 export async function tagAsInterested(
-  req: { params: { propertyId: string }; user: { clientId: string } },
+  req: Request & { params: { propertyId: string }; user: { clientId: string } },
   res: Response
 ) {
   if (!req.user.clientId) {
@@ -88,5 +93,19 @@ export async function tagAsInterested(
   await Property.findByIdAndUpdate(req.params.propertyId, {
     $push: { interested: req.user.clientId },
   });
+  res.status(200).send();
+}
+
+export async function deleteProperty(
+  req: Request & { params: { propertyId: string }; user: { agentId: string } },
+  res: Response
+) {
+  if (!req.user.agentId) {
+    res.status(400).send();
+    return;
+  }
+
+  await Property.findByIdAndDelete(req.params.propertyId);
+
   res.status(200).send();
 }
