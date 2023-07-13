@@ -2,12 +2,14 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 type PersonalInfoType = {
   name: string | null;
+  type: "agent" | "client" | null;
   agentId: string | null;
   clientId: string | null;
 };
 
 const initialState = {
   name: null,
+  type: null,
   agentId: null,
   clientId: null,
 } as PersonalInfoType;
@@ -21,9 +23,11 @@ export const personalInfoSlice = createSlice({
       state.name = action.payload;
     },
     setAgentId: (state, action: PayloadAction<string>) => {
+      state.type = "agent";
       state.agentId = action.payload;
     },
     setClientId: (state, action: PayloadAction<string>) => {
+      state.type = "client";
       state.clientId = action.payload;
     },
   },

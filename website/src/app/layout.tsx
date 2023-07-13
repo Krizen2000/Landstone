@@ -1,9 +1,8 @@
 import "./globals.css";
+import "bootstrap-icons/font/bootstrap-icons.css";
 import type { Metadata } from "next";
-// import { Inter } from "next/font/google";
 import { ReduxProvider } from "../../redux/reduxProvider";
-
-// const inter = Inter({ subsets: ["latin"] });
+import NavigationBar from "./navigationBar";
 
 export const metadata: Metadata = {
   title: "Landstone",
@@ -18,9 +17,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      {/* <body className={inter.className}>{children}</body> */}
-      <body>
-        <ReduxProvider>{children}</ReduxProvider>
+      <body className="bg-gray-200">
+        <ReduxProvider>
+          <NavigationBar />
+          {children}
+        </ReduxProvider>
       </body>
     </html>
   );
