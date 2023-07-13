@@ -1,10 +1,10 @@
 "use client";
 
-import LogoIcon from "../../image/logo.svg";
+import { useAppSelector } from "@/redux/hooks";
+import LogoIcon from "@images/logo.svg";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { useAppSelector } from "../../redux/hooks";
 
 const NavigationBar: React.FC = () => {
   const isLoggedIn = useAppSelector((state) => state.personalInfo.type);

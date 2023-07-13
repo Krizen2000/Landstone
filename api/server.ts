@@ -18,6 +18,7 @@ const connectDB = async () => {
 
 connectDB().then(() => {
   app.listen(PORT, () => {
+    console.log(`[SERVER HOSTED ON PORT]: ${PORT}`);
     console.log("Listening for requests...");
   });
 });
