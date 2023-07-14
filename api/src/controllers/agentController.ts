@@ -1,4 +1,4 @@
-import cryptojs from "crypto-js";
+import CryptoJS from "crypto-js";
 import jwt from "jsonwebtoken";
 import Agent from "../models/Agent";
 import { Request, Response } from "express";
@@ -13,9 +13,8 @@ type AgentType = {
   email: string;
   password: string;
 };
-function isAgentType(obj): obj is AgentType {
+function isAgentType(obj): obj is Omit<AgentType, "_id"> {
   return (
-    typeof obj._id === "string" &&
     typeof obj.firstName === "string" &&
     typeof obj.lastName === "string" &&
     typeof obj.contact_no === "string" &&
@@ -31,16 +30,16 @@ export async function agentCreation(req: AgentCreationReq, res: Response) {
     return;
   }
 
-  const hashedPassword = cryptojs
-    .SHA256(req.body.password)
-    .toString(cryptojs.enc.Base64);
+  const hashedPassword = CryptoJS.SHA256(req.body.password).toString(
+    CryptoJS.enc.Base64
+  );
   req.body.password = hashedPassword;
 
   const matchFound = (await Agent.exists({ email: req.body.email }))
     ? true
     : false;
-  if (!matchFound) {
-    res.status(500).send();
+  if (matchFound) {
+    res.status(409).json({ error: "AGENT EXISTS" });
     return;
   }
 
@@ -55,7 +54,55 @@ export async function agentCreation(req: AgentCreationReq, res: Response) {
     { expiresIn: "10d" }
   );
 
-  res.status(201).json({ token });
+  res.status(201).json({ token, agentId: savedAgent._id });
+}
+
+type AgentLoginData = { email: string; password: string };
+function isAgentLoginData(obj): obj is AgentLoginData {
+  return typeof obj.email === "string" && typeof obj.password === "string";
+}
+type AgentLoginReq = Request & { body: AgentLoginData };
+export async function agentLogin(req: AgentLoginReq, res: Response) {
+  if (!isAgentLoginData(req.body)) {
+    res.status(400).send();
+    return;
+  }
+  try {
+    const agent = await Agent.findOne({ email: req.body.email });
+    if (!agent) {
+      res.status(400).json({ error: "AGENT NOT FOUND" });
+      return;
+    }
+
+    const loginPassword = CryptoJS.SHA256(req.body.password).toString(
+      CryptoJS.enc.Base64
+    );
+
+    if (agent.password !== loginPassword) {
+      res.status(401).json({ error: "PASSWORD MISMATCH!" });
+      console.error(
+        "Storedpass: "
+          .concat(agent.password)
+          .concat(" GivenPass: ")
+          .concat(loginPassword)
+      );
+      return;
+    }
+
+    const token = jwt.sign(
+      {
+        agentId: agent._id,
+      },
+      JWT_KEY
+    );
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password, _id, ...userInfo } = agent.toObject();
+    res.status(200).json({ ...userInfo, agentId: _id, token });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json(err);
+  }
 }
 
 type AgentInfo = Request & { query: { agentId: string } };
@@ -68,8 +115,8 @@ export async function getAgentInfo(req: AgentInfo, res: Response) {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { password, ...agentInfo } = agent.toObject();
-  res.status(500).json(agentInfo);
+  const { password, _id, ...agentInfo } = agent.toObject();
+  res.status(500).json({ ...agentInfo, agentId: _id });
 }
 
 type UpdateAgentReq = Request & {

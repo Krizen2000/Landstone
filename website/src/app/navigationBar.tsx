@@ -11,7 +11,7 @@ const NavigationBar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="bg-green-500 flex p-6 gap-6 flex-col lg:flex-row lg:justify-between">
+    <div className="bg-green-600 flex p-6 gap-6 flex-col lg:flex-row lg:justify-between lg:px-24">
       <div className="flex items-center justify-between">
         <Link
           onClick={() => setIsOpen(false)}
@@ -58,6 +58,24 @@ const NavigationBar: React.FC = () => {
                 <Link
                   className="hover:text-white"
                   onClick={() => setIsOpen(false)}
+                  href="/signupAgent"
+                >
+                  Register Agent
+                </Link>
+              </li>
+              <li className="text-gray-300">
+                <Link
+                  className="hover:text-white"
+                  onClick={() => setIsOpen(false)}
+                  href="/loginAgent"
+                >
+                  Login Agent
+                </Link>
+              </li>
+              <li className="text-gray-300">
+                <Link
+                  className="hover:text-white"
+                  onClick={() => setIsOpen(false)}
                   href="/signup"
                 >
                   Signup
@@ -80,7 +98,7 @@ const NavigationBar: React.FC = () => {
                   <Link
                     className="hover:text-white"
                     onClick={() => setIsOpen(false)}
-                    href="/myblogs"
+                    href="/dashboard"
                   >
                     Dashboard
                   </Link>

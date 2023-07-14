@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
   });
   let res: AxiosResponse;
   try {
-    res = await axiosInstance.post("/api/newsEmail", data);
+    res = await axiosInstance.post("/api/clients/login", data);
   } catch (error) {
     const err = error as AxiosError;
     return NextResponse.json(err.response?.data, {

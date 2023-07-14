@@ -83,6 +83,13 @@ export async function getPropertyInfo(req: PropertyInfoReq, res: Response) {
   res.status(200).json(property);
 }
 
+export async function getPopularProperties(req: Request, res: Response) {
+  Property.find()
+    .sort({ views: "desc" })
+    .limit(Number(req.query.limit) || 3)
+    .then((properties) => res.status(200).json({ properties }));
+}
+
 type UpdateProperyReq = Request & {
   params: {
     propertyId: string;

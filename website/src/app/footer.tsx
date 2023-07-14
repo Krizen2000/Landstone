@@ -7,7 +7,7 @@ import { useAppSelector } from "@/redux/hooks";
 const Footer: React.FC = () => {
   const isLoggedIn = useAppSelector((state) => state.personalInfo.type);
   return (
-    <footer className="py-8 flex flex-wrap items-start justify-between bg-green-500 md:px-24">
+    <footer className="py-8 flex flex-wrap items-start justify-between bg-green-600 md:px-24">
       <Link
         href="/"
         className="mt-8 mb-8 ml-2 cursor-pointer no-underline text-gray-300 hover:text-white font-medium text-4xl"
@@ -28,6 +28,18 @@ const Footer: React.FC = () => {
             </Link>
             {!isLoggedIn ? (
               <>
+                <Link
+                  href="/signupAgent"
+                  className="no-underline text-gray-300 hover:text-white"
+                >
+                  Register Agent
+                </Link>
+                <Link
+                  href="/loginAgent"
+                  className="no-underline text-gray-300 hover:text-white"
+                >
+                  Login Agent
+                </Link>
                 <Link
                   href="/signup"
                   className="no-underline text-gray-300 hover:text-white"

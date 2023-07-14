@@ -4,7 +4,7 @@ import axios from "axios";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { setIsSubscribed } from "../redux/slices/newsEmail";
 
-const uploadCredentials = async (email: string) => {
+const applyNewsLetters = async (email: string) => {
   const axiosInstance = axios.create({
     baseURL: process.env.BACKEND_SERVER_URL,
   });
@@ -20,7 +20,7 @@ const NewsLetterForm: React.FC = () => {
   const submitAction = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!newsEmail) return;
-    uploadCredentials(newsEmail)
+    applyNewsLetters(newsEmail)
       .then(() => dispatch(setIsSubscribed()))
       .catch((err) => {
         if (err.response?.data.error === "EMAIL_SUBSCRIBED") return;

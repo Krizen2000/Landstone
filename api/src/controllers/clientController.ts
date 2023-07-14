@@ -1,4 +1,4 @@
-import cryptojs from "crypto-js";
+import CryptoJS from "crypto-js";
 import jwt from "jsonwebtoken";
 import Client from "../models/Client";
 import { Request, Response } from "express";
@@ -16,9 +16,8 @@ type ClientType = {
   saved_properties: string[] | null;
   interested_properties: string[] | null;
 };
-function isClientType(obj): obj is ClientType {
+function isClientType(obj): obj is Omit<ClientType, "_id"> {
   return (
-    typeof obj._id === "string" &&
     typeof obj.firstName === "string" &&
     typeof obj.lastName === "string" &&
     typeof obj.contact_no === "string" &&
@@ -33,16 +32,17 @@ export async function clientCreation(req: ClientCreationReq, res: Response) {
     res.status(400).send();
     return;
   }
-  const hashedPassword = cryptojs
-    .SHA256(req.body.password)
-    .toString(cryptojs.enc.Base64);
+
+  const hashedPassword = CryptoJS.SHA256(req.body.password).toString(
+    CryptoJS.enc.Base64
+  );
   req.body.password = hashedPassword;
 
   const matchFound = (await Client.exists({ email: req.body.email }))
     ? true
     : false;
-  if (!matchFound) {
-    res.status(500).send();
+  if (matchFound) {
+    res.status(409).json({ error: "CLIENT EXISTS" });
     return;
   }
 
@@ -57,7 +57,55 @@ export async function clientCreation(req: ClientCreationReq, res: Response) {
     { expiresIn: "10d" }
   );
 
-  res.status(201).json({ token });
+  res.status(201).json({ token, clientId: savedClient._id });
+}
+
+type ClientLoginData = { email: string; password: string };
+function isClientLoginData(obj): obj is ClientLoginData {
+  return typeof obj.email === "string" && typeof obj.password === "string";
+}
+type ClientLoginReq = Request & { body: ClientLoginData };
+export async function clientLogin(req: ClientLoginReq, res: Response) {
+  if (!isClientLoginData(req.body)) {
+    res.status(400).send();
+    return;
+  }
+  try {
+    const client = await Client.findOne({ email: req.body.email });
+    if (!client) {
+      res.status(400).send();
+      return;
+    }
+
+    const loginPassword = CryptoJS.SHA256(req.body.password).toString(
+      CryptoJS.enc.Base64
+    );
+
+    if (client.password !== loginPassword) {
+      res.status(401).json({ error: "PASSWORD MISMATCH!" });
+      console.error(
+        "Storedpass: "
+          .concat(client.password)
+          .concat(" GivenPass: ")
+          .concat(loginPassword)
+      );
+      return;
+    }
+
+    const token = jwt.sign(
+      {
+        clientId: client._id,
+      },
+      JWT_KEY
+    );
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password, _id, ...userInfo } = client.toObject();
+    res.status(200).json({ ...userInfo, token, clientId: _id });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json(err);
+  }
 }
 
 type ClientInfoReq = Request & { query: { clientId: string } };
@@ -70,8 +118,8 @@ export async function getClientInfo(req: ClientInfoReq, res: Response) {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { password, ...agentInfo } = client.toObject();
-  res.status(500).json(agentInfo);
+  const { password, _id, ...agentInfo } = client.toObject();
+  res.status(500).json({ ...agentInfo, clientId: _id });
 }
 
 type UpdateClientReq = Request & {

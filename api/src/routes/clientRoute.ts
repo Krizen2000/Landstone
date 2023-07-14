@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   clientCreation,
+  clientLogin,
   getClientInfo,
   updateClientInfo,
 } from "../controllers/clientController";
@@ -10,6 +11,7 @@ const clientRouter = Router();
 
 clientRouter.get("/", getClientInfo);
 clientRouter.post("/", clientCreation);
+clientRouter.post("/login", clientLogin);
 clientRouter.put("/", tokenAuthorizer, updateClientInfo);
 
 export default clientRouter;

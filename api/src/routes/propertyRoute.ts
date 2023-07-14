@@ -12,6 +12,7 @@ import tokenAuthorizer from "../middlewares/tokenAuthorizer";
 const propertyRouter = Router();
 
 propertyRouter.get("/", tokenDecryptor, getPropertyInfo);
+propertyRouter.get("/popular", tokenDecryptor, getPropertyInfo);
 propertyRouter.post("/", tokenAuthorizer, propertyCreation);
 propertyRouter.put("/:propertyId", tokenAuthorizer, updatePropertyInfo);
 propertyRouter.put("/:propertyId/interested", tokenAuthorizer, tagAsInterested);
