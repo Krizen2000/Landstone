@@ -2,7 +2,18 @@ import mongoose from "mongoose";
 
 const PropertySchema = new mongoose.Schema({
   agentId: { type: String, required: true },
-  type: { type: String, required: true },
+  type: {
+    type: String,
+    enum: [
+      "property",
+      "resort",
+      "home",
+      "apartment",
+      "warehouse",
+      "storehouse",
+    ],
+    required: true,
+  },
   name: { type: String, required: true },
   image: { type: String, required: true },
   price: {

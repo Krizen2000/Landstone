@@ -17,15 +17,15 @@ type PropertyType = {
 };
 function isPropertyType(obj): obj is PropertyType {
   return (
-    typeof obj.agentId === "string" &&
+    typeof obj.agentId === "undefined" &&
+    typeof obj.views === "undefined" && // DISABLE BEFORE ADDING TESTING VALUES
+    typeof obj.interested === "undefined" && // DISABLE BEFORE ADDING TESTING VALUES
     typeof obj.type === "string" &&
     typeof obj.name === "string" &&
     typeof obj.price.from === "number" &&
     typeof obj.price.to === "number" &&
     typeof obj.description === "string" &&
-    typeof obj.location === "string" &&
-    typeof obj.visibility === "boolean" &&
-    typeof obj.views === "number"
+    typeof obj.location === "string"
   );
 }
 
@@ -37,7 +37,7 @@ export async function propertyCreation(
   req: PropertyCreationReq,
   res: Response
 ) {
-  if (!isPropertyType(req.body)) {
+  if (!isPropertyType(req.body) || !req.user.agentId || !req.body.name) {
     res.status(400).send();
     return;
   }
@@ -53,9 +53,9 @@ export async function propertyCreation(
   }
 
   const newProperty = new Property({ ...req.body, agentId: req.user.agentId });
-  await newProperty.save();
+  const { _id } = await newProperty.save();
 
-  res.status(201).send();
+  res.status(201).json({ propertyId: _id });
 }
 
 type PropertyInfoReq = Request & {
@@ -63,13 +63,17 @@ type PropertyInfoReq = Request & {
   user: { agentId: string } | null;
 };
 export async function getPropertyInfo(req: PropertyInfoReq, res: Response) {
+  if (!req.query.propertyId) {
+    res.status(400).send();
+    return;
+  }
   const property = await Property.findById(req.query.propertyId);
   if (!property) {
-    res.status(404).send();
+    res.status(404).json({ error: "PROPERTY NOT FOUND" });
     return;
   }
   if (!property.visibility && property.agentId !== (req.user?.agentId ?? "")) {
-    res.status(404).send();
+    res.status(404).json({ error: "PROPERTY NOT FOUND" });
     return;
   }
 
@@ -98,6 +102,10 @@ type UpdateProperyReq = Request & {
   user: { agentId: string };
 };
 export async function updatePropertyInfo(req: UpdateProperyReq, res: Response) {
+  if (!req.user.agentId) {
+    res.status(400).send();
+    return;
+  }
   const property = await Property.findById(req.params.propertyId);
   if ((property?.agentId ?? "") !== req.user.agentId) {
     res.status(400).send();
@@ -117,7 +125,6 @@ export async function tagAsInterested(req: InterestedReq, res: Response) {
     res.status(400).send();
     return;
   }
-
   await Property.findByIdAndUpdate(req.params.propertyId, {
     $push: { interested: req.user.clientId },
   });
@@ -133,8 +140,11 @@ export async function deleteProperty(req: DeletePropertyReq, res: Response) {
     res.status(400).send();
     return;
   }
-
+  const property = await Property.findById(req.params.propertyId);
+  if ((property?.agentId ?? "") !== req.user.agentId) {
+    res.status(400).send();
+    return;
+  }
   await Property.findByIdAndDelete(req.params.propertyId);
-
   res.status(200).send();
 }

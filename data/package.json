@@ -1,0 +1,18 @@
+{
+  "name": "data",
+  "version": "1.0.0",
+  "description": "Add data to Landstone website",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Krizen Knoz",
+  "license": "MIT License",
+  "dependencies": {
+    "@faker-js/faker": "^8.0.2",
+    "axios": "^1.4.0",
+    "dotenv": "^16.3.1"
+  }
+}

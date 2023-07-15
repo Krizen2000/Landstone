@@ -14,7 +14,6 @@ type ClientType = {
   password: string;
 
   saved_properties: string[] | null;
-  interested_properties: string[] | null;
 };
 function isClientType(obj): obj is Omit<ClientType, "_id"> {
   return (
@@ -28,7 +27,7 @@ function isClientType(obj): obj is Omit<ClientType, "_id"> {
 
 type ClientCreationReq = Request & { body: ClientType };
 export async function clientCreation(req: ClientCreationReq, res: Response) {
-  if (!isClientType(req.body)) {
+  if (!isClientType(req.body) || !req.body.email) {
     res.status(400).send();
     return;
   }
@@ -66,7 +65,7 @@ function isClientLoginData(obj): obj is ClientLoginData {
 }
 type ClientLoginReq = Request & { body: ClientLoginData };
 export async function clientLogin(req: ClientLoginReq, res: Response) {
-  if (!isClientLoginData(req.body)) {
+  if (!isClientLoginData(req.body) || !req.body.email) {
     res.status(400).send();
     return;
   }

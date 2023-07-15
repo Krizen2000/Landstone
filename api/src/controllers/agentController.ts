@@ -25,7 +25,7 @@ function isAgentType(obj): obj is Omit<AgentType, "_id"> {
 
 type AgentCreationReq = Request & { body: AgentType };
 export async function agentCreation(req: AgentCreationReq, res: Response) {
-  if (!isAgentType(req.body)) {
+  if (!isAgentType(req.body) || !req.body.email) {
     res.status(400).send();
     return;
   }
@@ -63,7 +63,7 @@ function isAgentLoginData(obj): obj is AgentLoginData {
 }
 type AgentLoginReq = Request & { body: AgentLoginData };
 export async function agentLogin(req: AgentLoginReq, res: Response) {
-  if (!isAgentLoginData(req.body)) {
+  if (!isAgentLoginData(req.body) || !req.body.email) {
     res.status(400).send();
     return;
   }

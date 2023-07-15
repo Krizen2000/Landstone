@@ -8,7 +8,6 @@ const ClientSchema = new mongoose.Schema({
   password: { type: String, required: true },
 
   saved_properties: { type: [String], required: false },
-  interested_properties: { type: [String], required: false },
 });
 
 const Client = mongoose.model("Client", ClientSchema);
