@@ -132,8 +132,10 @@ export default function PropertiesSection() {
                   inx % 2 == 1 ? "bg-green-200" : "bg-green-50",
                 ].join(" ")}
               >
-                <td className="px-3 py-2 text-sm text-center">
-                  {property.name}
+                <td className="px-3 py-2 text-sm text-center underline text-blue-600">
+                  <Link href={`/properties/${property._id}`}>
+                    {property.name}
+                  </Link>
                 </td>
                 <td className="px-3 py-2 text-sm text-center">
                   {property.type}

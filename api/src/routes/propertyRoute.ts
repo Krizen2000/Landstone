@@ -7,6 +7,7 @@ import {
   getPropertyInfoByPropertyId,
   propertyCreation,
   tagAsInterested,
+  untagAsInterested,
   updatePropertyInfo,
 } from "../controllers/propertyController";
 import tokenAuthorizer from "../middlewares/tokenAuthorizer";
@@ -22,7 +23,8 @@ propertyRouter.get(
 );
 propertyRouter.post("/", tokenAuthorizer, propertyCreation);
 propertyRouter.put("/:propertyId", tokenAuthorizer, updatePropertyInfo);
-propertyRouter.put("/:propertyId/interested", tokenAuthorizer, tagAsInterested);
+propertyRouter.put("/:propertyId/tag", tokenAuthorizer, tagAsInterested);
+propertyRouter.put("/:propertyId/untag", tokenAuthorizer, untagAsInterested);
 propertyRouter.delete("/:propertyId", tokenAuthorizer, deleteProperty);
 
 export default propertyRouter;

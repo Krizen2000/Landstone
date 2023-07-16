@@ -83,6 +83,8 @@ export async function getPropertyInfoByPropertyId(
     res.status(404).json({ error: "PROPERTY NOT FOUND" });
     return;
   }
+  console.log("propertyagent:", property.agentId); // TEST
+  console.log("tokenagent:", req.user?.agentId); // TEST
   if (!property.visibility && property.agentId !== (req.user?.agentId ?? "")) {
     res.status(404).json({ error: "PROPERTY NOT FOUND" });
     return;
@@ -156,8 +158,21 @@ export async function tagAsInterested(req: InterestedReq, res: Response) {
   }
   await Property.findByIdAndUpdate(req.params.propertyId, {
     $push: { interested: req.user.clientId },
-  });
-  res.status(200).send();
+  })
+    .then(() => res.status(200).send())
+    .catch((err) => res.status(500).json({ error: err }));
+}
+
+export async function untagAsInterested(req: InterestedReq, res: Response) {
+  if (!req.user.clientId) {
+    res.status(400).send();
+    return;
+  }
+  await Property.findByIdAndUpdate(req.params.propertyId, {
+    $push: { interested: req.user.clientId },
+  })
+    .then(() => res.status(200).send())
+    .catch((err) => res.status(500).json({ error: err }));
 }
 
 type DeletePropertyReq = Request & {

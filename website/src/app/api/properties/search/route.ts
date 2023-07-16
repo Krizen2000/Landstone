@@ -17,10 +17,11 @@ export async function GET(request: NextRequest) {
       res = await axiosInstance.get(
         `/api/properties/search?agentId=${String(agentId)}`
       );
-    else
+    else {
       res = await axiosInstance.get(
         `/api/properties/search?propertyId=${propertyId}`
       );
+    }
   } catch (error) {
     const err = error as AxiosError;
     return NextResponse.json(err.response?.data, {
