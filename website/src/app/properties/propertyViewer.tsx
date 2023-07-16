@@ -46,7 +46,7 @@ export default function PropertyViewer() {
         (a, b) => b.views.length - a.views.length
       );
       setProperties(properties);
-      setSearchProperties(properties);
+      setSearchProperties(sortedProperties);
     });
   }, []);
   useEffect(() => {
