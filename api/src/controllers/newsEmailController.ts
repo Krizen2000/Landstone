@@ -9,7 +9,6 @@ function isNewsEmail(obj): obj is NewsEmailType {
 }
 
 export async function newsEmailEntry(req: NewsEmailReq, res: Response) {
-  console.log("Reached: newsEmailEntry \nreq: ", req.body);
   if (!isNewsEmail(req.body)) {
     res.status(400).send();
     return;

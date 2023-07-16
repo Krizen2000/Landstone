@@ -39,9 +39,8 @@ async function requestPropertyDeletion(propertyId: string, token: string) {
   let axiosInstance = axios.create({
     headers: { Authorization: `bearer ${token}` },
   });
-  let res: AxiosResponse;
   try {
-    res = await axiosInstance.delete(`/api/properties/${propertyId}`);
+    await axiosInstance.delete(`/api/properties/${propertyId}`);
   } catch (err) {
     console.log(err);
     return false;

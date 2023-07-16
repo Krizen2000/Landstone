@@ -56,7 +56,6 @@ export default function Dashboard() {
       return;
     }
     requestProperties(agentId).then((properties) => {
-      console.log("properties:", properties);
       if (!properties) return;
       const propertiesLength = properties.length;
       const visitorsLength = properties.reduce(
