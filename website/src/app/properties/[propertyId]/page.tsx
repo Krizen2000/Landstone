@@ -145,8 +145,10 @@ export default function PropertyDetailing(props: Props) {
     requestTagProperty(props.params.propertyId, token);
     router.refresh();
   };
-  const untagAction = () =>
+  const untagAction = () => {
     requestUntagProperty(props.params.propertyId, token);
+    router.refresh();
+  };
   const saveAction = () => {
     requestSaveProperty(props.params.propertyId, token);
     router.refresh();

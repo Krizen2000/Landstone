@@ -42,6 +42,7 @@ export async function propertyCreation(
     return;
   }
 
+  // * DISABLE BEFORE ADDING TEST VALUES
   const matchProperty = await Property.findOne({
     name: req.user.agentId.toLowerCase(),
   });
@@ -51,6 +52,7 @@ export async function propertyCreation(
       return;
     }
   }
+  // **
 
   const newProperty = new Property({ ...req.body, agentId: req.user.agentId });
   const { _id } = await newProperty.save();
@@ -80,12 +82,6 @@ export async function getPropertyInfoByPropertyId(
   }
   const property = await Property.findById(req.query.propertyId);
   if (!property) {
-    res.status(404).json({ error: "PROPERTY NOT FOUND" });
-    return;
-  }
-  console.log("propertyagent:", property.agentId); // TEST
-  console.log("tokenagent:", req.user?.agentId); // TEST
-  if (!property.visibility && property.agentId !== (req.user?.agentId ?? "")) {
     res.status(404).json({ error: "PROPERTY NOT FOUND" });
     return;
   }

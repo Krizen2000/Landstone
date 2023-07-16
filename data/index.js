@@ -74,6 +74,7 @@ async function main() {
       `${process.env.BACKEND_API_URL}/api/${type}`,
       user
     );
+    console.log("data", data);
     if (type === "agents") {
       const { token, agentId } = data;
       return { token, agentId };
@@ -91,19 +92,25 @@ async function main() {
   const interestedClientIdGen = (n) =>
     clientInfo.slice(0, n).map((val) => val.clientId);
 
-  const { token: designatedAgentToken } = await getAuthToken(
-    designatedPerson,
-    "agents"
-  );
+  const { token: designatedAgentToken, agentId: designatedAgentId } =
+    await getAuthToken(designatedPerson, "agents");
+  const { token: designatedClientToken, clientId: designatedClientId } =
+    await getAuthToken(designatedPerson, "clients");
 
-  // Designated Properties for the agent
+  // Properties for the designated agent and client
   await Promise.all(
     properties.slice(0, 5).map(async (property) => {
       const randomNumber = Math.floor(Math.random() * (clients.length - 10));
       const propertyInfo = {
         ...property,
-        interested: interestedClientIdGen(randomNumber),
-        views: interestedClientIdGen(randomNumber + 10),
+        interested: [
+          ...interestedClientIdGen(randomNumber),
+          designatedClientId,
+        ],
+        views: [
+          ...interestedClientIdGen(randomNumber + 10),
+          designatedClientId,
+        ],
       };
       await axios.post(
         `${process.env.BACKEND_API_URL}/api/properties`,
