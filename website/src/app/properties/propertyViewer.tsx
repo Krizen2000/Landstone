@@ -134,9 +134,12 @@ export default function PropertyViewer() {
                 <p className="text-center">{property.location}</p>
               </div>
               <p className="text-center">{property.views.length} views</p>
-              <p className="text-center">{`${numFormatter.format(
-                property.price.from
-              )} - ${numFormatter.format(property.price.to)}`}</p>
+              <p className="text-center">
+                {numFormatter.formatRange(
+                  property.price.from,
+                  property.price.to
+                )}
+              </p>
             </div>
           </Link>
         ))}

@@ -140,9 +140,12 @@ export default function PropertiesSection() {
                 <td className="px-3 py-2 text-sm text-center">
                   {property.type}
                 </td>
-                <td className="px-3 py-2 text-sm text-center">{`${numFormatter.format(
-                  property.price.from
-                )}-${numFormatter.format(property.price.to)}`}</td>
+                <td className="px-3 py-2 text-sm text-center">
+                  {numFormatter.formatRange(
+                    property.price.from,
+                    property.price.to
+                  )}
+                </td>
                 <td className="px-3 py-2 text-sm text-center">
                   {property.location}
                 </td>

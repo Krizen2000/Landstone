@@ -113,6 +113,23 @@ export async function getPropertiesByAgentId(
   res.status(200).json({ properties });
 }
 
+export async function getPropertiesByClientId(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  if (!req.query.clientId) {
+    next();
+    return;
+  }
+  const properties = await Property.find({ agentId: req.query.clientId });
+  if (!properties) {
+    res.status(404).json({ error: "PROPERTIES NOT FOUND" });
+    return;
+  }
+  res.status(200).json({ properties });
+}
+
 export async function getPopularProperties(req: Request, res: Response) {
   Property.find()
     .sort({ views: "desc" })

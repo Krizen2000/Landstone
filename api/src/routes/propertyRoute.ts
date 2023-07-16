@@ -4,6 +4,7 @@ import {
   deleteProperty,
   getProperties,
   getPropertiesByAgentId,
+  getPropertiesByClientId,
   getPropertyInfoByPropertyId,
   propertyCreation,
   tagAsInterested,
@@ -14,7 +15,7 @@ import tokenAuthorizer from "../middlewares/tokenAuthorizer";
 
 const propertyRouter = Router();
 
-propertyRouter.get("/", tokenDecryptor, getProperties);
+propertyRouter.get("/", tokenDecryptor, getPropertiesByClientId, getProperties);
 propertyRouter.get(
   "/search",
   tokenDecryptor,

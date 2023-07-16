@@ -60,12 +60,10 @@ export async function clientCreation(req: ClientCreationReq, res: Response) {
 }
 
 type ClientLoginData = { email: string; password: string };
-function isClientLoginData(obj): obj is ClientLoginData {
-  return typeof obj.email === "string" && typeof obj.password === "string";
-}
 type ClientLoginReq = Request & { body: ClientLoginData };
 export async function clientLogin(req: ClientLoginReq, res: Response) {
-  if (!isClientLoginData(req.body) || !req.body.email) {
+  console.log("req.body:", req.body); // TEST
+  if (!req.body.email || !req.body.password) {
     res.status(400).send();
     return;
   }
@@ -75,16 +73,17 @@ export async function clientLogin(req: ClientLoginReq, res: Response) {
       res.status(400).send();
       return;
     }
+    const clientInfo = client.toObject();
 
     const loginPassword = CryptoJS.SHA256(req.body.password).toString(
       CryptoJS.enc.Base64
     );
 
-    if (client.password !== loginPassword) {
+    if (clientInfo.password !== loginPassword) {
       res.status(401).json({ error: "PASSWORD MISMATCH!" });
       console.error(
         "Storedpass: "
-          .concat(client.password)
+          .concat(clientInfo.password)
           .concat(" GivenPass: ")
           .concat(loginPassword)
       );
@@ -99,7 +98,7 @@ export async function clientLogin(req: ClientLoginReq, res: Response) {
     );
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password, _id, ...userInfo } = client.toObject();
+    const { password, _id, ...userInfo } = clientInfo;
     res.status(200).json({ ...userInfo, token, clientId: _id });
   } catch (err) {
     console.log(err);
