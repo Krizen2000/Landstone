@@ -52,6 +52,15 @@ const NavigationBar: React.FC = () => {
               Home
             </Link>
           </li>
+          <li className="text-gray-300">
+            <Link
+              className="hover:text-white"
+              onClick={() => setIsOpen(false)}
+              href="/properties"
+            >
+              Properties
+            </Link>
+          </li>
           {!isLoggedIn ? (
             <>
               <li className="text-gray-300">

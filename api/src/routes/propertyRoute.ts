@@ -2,6 +2,7 @@ import { Router } from "express";
 import tokenDecryptor from "../middlewares/tokenDecryptor";
 import {
   deleteProperty,
+  getProperties,
   getPropertiesByAgentId,
   getPropertyInfoByPropertyId,
   propertyCreation,
@@ -12,7 +13,7 @@ import tokenAuthorizer from "../middlewares/tokenAuthorizer";
 
 const propertyRouter = Router();
 
-// propertyRouter.get("/popular", tokenDecryptor, getPropertyInfoByPropertyId);
+propertyRouter.get("/", tokenDecryptor, getProperties);
 propertyRouter.get(
   "/search",
   tokenDecryptor,

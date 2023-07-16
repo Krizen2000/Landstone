@@ -6,7 +6,7 @@ type PropertyType = {
   type: string;
   name: string;
   price: {
-    form: number;
+    from: number;
     to: number;
   };
   description: string;
@@ -56,6 +56,14 @@ export async function propertyCreation(
   const { _id } = await newProperty.save();
 
   res.status(201).json({ propertyId: _id });
+}
+
+export async function getProperties(_: Request, res: Response) {
+  Property.find().then((properties) =>
+    res
+      .status(200)
+      .json({ properties: properties.map((property) => property.toObject()) })
+  );
 }
 
 type PropertyInfoReq = Request & {

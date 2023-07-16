@@ -26,6 +26,12 @@ const Footer: React.FC = () => {
             >
               Home
             </Link>
+            <Link
+              href="/properties"
+              className="no-underline text-gray-300 hover:text-white"
+            >
+              Properties
+            </Link>
             {!isLoggedIn ? (
               <>
                 <Link
