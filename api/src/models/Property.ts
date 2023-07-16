@@ -24,7 +24,7 @@ const PropertySchema = new mongoose.Schema({
   location: { type: String, required: true },
   visibility: { type: Boolean, required: true, default: true },
   interested: { type: [String], required: true, default: [] },
-  views: { type: Number, required: true, default: 0 },
+  views: { type: [String], required: true, default: [] },
 });
 
 const Property = mongoose.model("Property", PropertySchema);

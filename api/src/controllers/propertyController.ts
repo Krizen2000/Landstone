@@ -1,5 +1,5 @@
 import Property from "../models/Property";
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 
 type PropertyType = {
   agentId: string;
@@ -13,7 +13,7 @@ type PropertyType = {
   location: string;
   visibility: boolean;
   interested: string[];
-  views: number;
+  views: string[];
 };
 function isPropertyType(obj): obj is PropertyType {
   return (
@@ -60,9 +60,12 @@ export async function propertyCreation(
 
 type PropertyInfoReq = Request & {
   query: { propertyId: string };
-  user: { agentId: string } | null;
+  user: { agentId: string | null; clientId: string | null } | null;
 };
-export async function getPropertyInfo(req: PropertyInfoReq, res: Response) {
+export async function getPropertyInfoByPropertyId(
+  req: PropertyInfoReq,
+  res: Response
+) {
   if (!req.query.propertyId) {
     res.status(400).send();
     return;
@@ -77,14 +80,31 @@ export async function getPropertyInfo(req: PropertyInfoReq, res: Response) {
     return;
   }
 
-  if (property.agentId == (req.user?.agentId ?? "")) {
+  if (!req.user?.clientId) {
     res.status(200).json(property);
     return;
   }
   await Property.findByIdAndUpdate(req.query.propertyId, {
-    $inc: { views: 1 },
+    $push: { views: req.user.clientId },
   });
   res.status(200).json(property);
+}
+
+export async function getPropertiesByAgentId(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  if (!req.query.agentId) {
+    next();
+    return;
+  }
+  const properties = await Property.find({ agentId: req.query.agentId });
+  if (!properties) {
+    res.status(404).json({ error: "PROPERTIES NOT FOUND" });
+    return;
+  }
+  res.status(200).json({ properties });
 }
 
 export async function getPopularProperties(req: Request, res: Response) {
@@ -106,6 +126,7 @@ export async function updatePropertyInfo(req: UpdateProperyReq, res: Response) {
     res.status(400).send();
     return;
   }
+
   const property = await Property.findById(req.params.propertyId);
   if ((property?.agentId ?? "") !== req.user.agentId) {
     res.status(400).send();
@@ -141,7 +162,7 @@ export async function deleteProperty(req: DeletePropertyReq, res: Response) {
     return;
   }
   const property = await Property.findById(req.params.propertyId);
-  if ((property?.agentId ?? "") !== req.user.agentId) {
+  if ((property && property.agentId) !== req.user.agentId) {
     res.status(400).send();
     return;
   }

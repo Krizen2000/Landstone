@@ -2,7 +2,8 @@ import { Router } from "express";
 import tokenDecryptor from "../middlewares/tokenDecryptor";
 import {
   deleteProperty,
-  getPropertyInfo,
+  getPropertiesByAgentId,
+  getPropertyInfoByPropertyId,
   propertyCreation,
   tagAsInterested,
   updatePropertyInfo,
@@ -11,8 +12,13 @@ import tokenAuthorizer from "../middlewares/tokenAuthorizer";
 
 const propertyRouter = Router();
 
-propertyRouter.get("/", tokenDecryptor, getPropertyInfo);
-propertyRouter.get("/popular", tokenDecryptor, getPropertyInfo);
+// propertyRouter.get("/popular", tokenDecryptor, getPropertyInfoByPropertyId);
+propertyRouter.get(
+  "/search",
+  tokenDecryptor,
+  getPropertiesByAgentId,
+  getPropertyInfoByPropertyId
+);
 propertyRouter.post("/", tokenAuthorizer, propertyCreation);
 propertyRouter.put("/:propertyId", tokenAuthorizer, updatePropertyInfo);
 propertyRouter.put("/:propertyId/interested", tokenAuthorizer, tagAsInterested);

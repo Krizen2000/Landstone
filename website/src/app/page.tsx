@@ -46,7 +46,7 @@ export default function Home() {
           </div>
         </div>
         <ol className="grid gap-5 relative border-l-4 border-green-500 p-3">
-          <li className=" content-start">
+          <li className="content-start">
             <div className="w-3 h-3 bg-yellow-500 rounded-full absolute mt-1 -left-2" />
             <p className="text-sm">Step 1</p>
             <h3 className="text-2xl underline">Browsing List</h3>

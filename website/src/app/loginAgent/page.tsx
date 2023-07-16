@@ -56,7 +56,6 @@ export default function LoginAgent() {
     const value = await requestAgentLogin(email, password);
     if (!value) return;
     const { token, agentId, name } = value;
-    console.log("token", token, "agentid", agentId, "name", name);
 
     if (!token) return;
     dispatch(setToken(token));

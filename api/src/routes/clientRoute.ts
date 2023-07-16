@@ -9,7 +9,8 @@ import tokenAuthorizer from "../middlewares/tokenAuthorizer";
 
 const clientRouter = Router();
 
-clientRouter.get("/", getClientInfo);
+// clientRouter.get("/", getClientInfo);
+clientRouter.get("/search", getClientInfo);
 clientRouter.post("/", clientCreation);
 clientRouter.post("/login", clientLogin);
 clientRouter.put("/", tokenAuthorizer, updateClientInfo);

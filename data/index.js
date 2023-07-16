@@ -24,7 +24,7 @@ async function main() {
   }
 
   let clients = [];
-  for (let i = 0; i < 50; i++) {
+  for (let i = 0; i < 60; i++) {
     const client = {
       firstName: faker.person.firstName(),
       lastName: faker.person.lastName(),
@@ -63,7 +63,6 @@ async function main() {
         from: Number(faker.finance.amount(1_000_000, 10_000_000)),
         to: Number(faker.finance.amount(10_000_000, 1_00_000_000)),
       },
-      views: faker.number.int(2, 50),
     };
 
     properties.push(property);
@@ -96,12 +95,15 @@ async function main() {
     designatedPerson,
     "agents"
   );
+
+  // Designated Properties for the agent
   await Promise.all(
     properties.slice(0, 5).map(async (property) => {
-      const randomNumber = Math.floor(Math.random() * clients.length);
+      const randomNumber = Math.floor(Math.random() * (clients.length - 10));
       const propertyInfo = {
         ...property,
         interested: interestedClientIdGen(randomNumber),
+        views: interestedClientIdGen(randomNumber + 10),
       };
       await axios.post(
         `${process.env.BACKEND_API_URL}/api/properties`,
@@ -118,6 +120,7 @@ async function main() {
     const propertyInfo = {
       ...property,
       interested: interestedClientIdGen(randomNumber),
+      views: interestedClientIdGen(randomNumber + 10),
     };
     await axios.post(
       `${process.env.BACKEND_API_URL}/api/properties`,
