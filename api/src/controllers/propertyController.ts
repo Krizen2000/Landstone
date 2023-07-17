@@ -169,6 +169,24 @@ export async function tagAsInterested(req: InterestedReq, res: Response) {
     res.status(400).send();
     return;
   }
+  const propertyObj = await Property.exists({ _id: req.params.propertyId });
+  const exists = propertyObj ? true : false;
+  if (!exists) {
+    res.status(404).send();
+    return;
+  }
+  const property = await Property.findById(req.params.propertyId);
+  const propertyInfo = property?.toObject() ?? null;
+  if (!propertyInfo) {
+    res.status(500).json({ error: "PROPERTY NOT FOUND" });
+    return;
+  }
+  const itemExists = propertyInfo.interested.indexOf(req.user.clientId);
+  if (itemExists > 0) {
+    res.status(200).send();
+    return;
+  }
+
   await Property.findByIdAndUpdate(req.params.propertyId, {
     $push: { interested: req.user.clientId },
   })
@@ -181,8 +199,26 @@ export async function untagAsInterested(req: InterestedReq, res: Response) {
     res.status(400).send();
     return;
   }
+  const propertyObj = await Property.exists({ _id: req.params.propertyId });
+  const exists = propertyObj ? true : false;
+  if (!exists) {
+    res.status(404).send();
+    return;
+  }
+  const property = await Property.findById(req.params.propertyId);
+  const propertyInfo = property?.toObject() ?? null;
+  if (!propertyInfo) {
+    res.status(500).json({ error: "PROPERTY NOT FOUND" });
+    return;
+  }
+  const itemExists = propertyInfo.interested.indexOf(req.user.clientId);
+  if (itemExists < 0) {
+    res.status(200).send();
+    return;
+  }
+
   await Property.findByIdAndUpdate(req.params.propertyId, {
-    $push: { interested: req.user.clientId },
+    $pull: { interested: req.user.clientId },
   })
     .then(() => res.status(200).send())
     .catch((err) => res.status(500).json({ error: err }));

@@ -13,7 +13,7 @@ type ClientType = {
   email: string;
   password: string;
 
-  saved_properties: string[] | null;
+  saved_properties: string[];
 };
 function isClientType(obj): obj is Omit<ClientType, "_id"> {
   return (
@@ -62,7 +62,6 @@ export async function clientCreation(req: ClientCreationReq, res: Response) {
 type ClientLoginData = { email: string; password: string };
 type ClientLoginReq = Request & { body: ClientLoginData };
 export async function clientLogin(req: ClientLoginReq, res: Response) {
-  console.log("req.body:", req.body); // TEST
   if (!req.body.email || !req.body.password) {
     res.status(400).send();
     return;
@@ -151,6 +150,10 @@ type SaveUnsavePropertyReq = Request & {
   body: { propertyId: string };
 };
 export async function saveProperty(req: SaveUnsavePropertyReq, res: Response) {
+  if (!req.body.propertyId) {
+    res.status(400).send();
+    return;
+  }
   const clientObj = await Client.exists({ _id: req.user.clientId });
   const exists = clientObj ? true : false;
   if (!exists) {
@@ -158,8 +161,13 @@ export async function saveProperty(req: SaveUnsavePropertyReq, res: Response) {
     return;
   }
   const client = await Client.findById(req.user.clientId);
-  const index = client?.saved_properties.findIndex(req.body.propertyId);
-  if (index) {
+  const clientInfo = client?.toObject() ?? null;
+  if (!clientInfo) {
+    res.status(500).json({ error: "CLIENT NOT FOUND" });
+    return;
+  }
+  const itemExists = clientInfo.saved_properties.indexOf(req.body.propertyId);
+  if (itemExists > 0) {
     res.status(200).send();
     return;
   }
@@ -184,14 +192,19 @@ export async function unsaveProperty(
     return;
   }
   const client = await Client.findById(req.user.clientId);
-  const index = client?.saved_properties.findIndex(req.body.propertyId);
-  if (!index) {
+  const clientInfo = client?.toObject() ?? null;
+  if (!clientInfo) {
+    res.status(500).json({ error: "CLIENT NOT FOUND" });
+    return;
+  }
+  const itemExists = clientInfo.saved_properties.indexOf(req.body.propertyId);
+  if (itemExists > 0) {
     res.status(200).send();
     return;
   }
 
   await Client.findByIdAndUpdate(req.user.clientId, {
-    $pop: {
+    $pull: {
       saved_properties: req.body.propertyId,
     },
   })

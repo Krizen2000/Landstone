@@ -7,7 +7,7 @@ const ClientSchema = new mongoose.Schema({
   email: { type: String, required: true },
   password: { type: String, required: true },
 
-  saved_properties: { type: [String], required: false },
+  saved_properties: { type: [String], required: true, default: [] },
 });
 
 const Client = mongoose.model("Client", ClientSchema);
