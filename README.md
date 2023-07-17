@@ -65,7 +65,14 @@ npm run start
 (website) npm run build && npm run start
 ```
 
-9. Additionally to run the development server use the following command
+9. Can browse UI without filling details using the below account works for both client and agent
+
+```js
+EMAIL="john@gmail.com"
+PASSWORD="john"
+```
+
+10. Additionally to run the development server use the following command
 
 ```bash
 (api) npm run dev
