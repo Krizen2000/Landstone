@@ -1,6 +1,8 @@
 import Property from "../models/Property";
 import { NextFunction, Request, Response } from "express";
 
+const DISABLE_CHECKS = process.env.DISABLE_CHECKS?.toLowerCase() === "true";
+
 type PropertyType = {
   agentId: string;
   type: string;
@@ -37,19 +39,25 @@ export async function propertyCreation(
   req: PropertyCreationReq,
   res: Response
 ) {
-  if (!isPropertyType(req.body) || !req.user.agentId || !req.body.name) {
+  if (
+    !isPropertyType(req.body) ||
+    !req.user.agentId ||
+    (!req.body.name && !DISABLE_CHECKS)
+  ) {
     res.status(400).send();
     return;
   }
 
   // * DISABLE BEFORE ADDING TEST VALUES
-  const matchProperty = await Property.findOne({
-    name: req.user.agentId.toLowerCase(),
-  });
-  if (matchProperty) {
-    if (matchProperty.agentId === req.user.agentId) {
-      res.status(400).send();
-      return;
+  if (DISABLE_CHECKS) {
+    const matchProperty = await Property.findOne({
+      name: req.user.agentId.toLowerCase(),
+    });
+    if (matchProperty) {
+      if (matchProperty.agentId === req.user.agentId) {
+        res.status(400).send();
+        return;
+      }
     }
   }
   // **
