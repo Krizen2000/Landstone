@@ -65,7 +65,7 @@ async function requestProperty(
 }
 
 export default function Profile() {
-  const { token, clientId } = useAppSelector(
+  const { clientId } = useAppSelector(
     ({ token, personalInfo: { clientId } }) => ({ token, clientId })
   );
   const [selectedSection, setSelectedSection] = useState("saved");
