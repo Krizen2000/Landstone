@@ -4,29 +4,6 @@ import { useAppSelector } from "@/redux/hooks";
 import axios, { AxiosResponse } from "axios";
 import { useEffect, useState } from "react";
 
-type Properties = [
-  {
-    name: string;
-    type: [
-      "property",
-      "resort",
-      "home",
-      "apartment",
-      "warehouse",
-      "storehouse",
-    ];
-    image: string;
-    price: {
-      from: number;
-      to: number;
-    };
-    description: string;
-    location: string;
-    visibility: boolean;
-    views: string[];
-    interested: string[];
-  },
-];
 type Client = {
   clientId: string;
   firstName: String;
@@ -35,61 +12,32 @@ type Client = {
   email: String;
   password: String;
 };
-async function requestProperties(agentId: string): Promise<Properties | null> {
-  let res: AxiosResponse;
+async function requestInterestedClientsDetails(agentId:string): Promise<Client[] | null> {
+  let res: AxiosResponse
   try {
-    res = await axios.get(`/api/properties/search?agentId=${agentId}`);
-  } catch (err) {
-    console.log(err);
+    res = await axios.get(`/api/clients/interestedByAgentId?agentId=${agentId}`)
+  } catch(err) {
+    console.log(err)
     return null;
   }
-  if (!res.data.properties) return null;
-  return res.data.properties;
-}
-async function requestVisitorInfo(clientId: string): Promise<Client | null> {
-  let res: AxiosResponse;
-  try {
-    res = await axios.get(`/api/clients/search?clientId=${clientId}`);
-  } catch (err) {
-    console.log(err);
-    return null;
-  }
-  if (!res.data) return null;
-  return res.data;
+  if (!res.data.clients) return null;
+  return res.data.clients;
 }
 
 export default function InterestedSection() {
   const agentId = useAppSelector((state) => state.personalInfo.agentId);
-  const [interested, setInterested] = useState(Array<Client>);
+  const [interested, setInterested] = useState(Array<Client>());
   useEffect(() => {
     if (!agentId) {
       alert("UnAuthorized Access!");
       return;
     }
-    requestProperties(agentId).then((properties) => {
-      console.log("properties:", properties);
-      if (!properties) return;
-      Promise.all(
-        properties
-          .map((property) => property.interested)
-          .reduce((state, idGroup) => [...state, ...idGroup])
-          .map(async (clientId) => {
-            const interestedVisitor = await requestVisitorInfo(clientId);
-            if (!interestedVisitor) {
-              console.log(
-                "Client ID: ",
-                clientId,
-                "ClientInfo: ",
-                interestedVisitor
-              );
-              throw new Error("VISITOR NOT FOUND");
-            }
-            return interestedVisitor;
-          })
-      )
-        .then((interestedVisitors) => setInterested(interestedVisitors))
-        .catch((err: Error) => console.log(err.message));
-    });
+    const runner = async () => {
+      const interestedClients = await requestInterestedClientsDetails(agentId)
+      if(!interestedClients) return
+      setInterested(interestedClients)
+    };
+    runner()
   }, []);
 
   return (

@@ -35,6 +35,7 @@ async function requestProperties(agentId: string): Promise<Property[] | null> {
   if (!res.data.properties) return null;
   return res.data.properties;
 }
+
 async function requestPropertyDeletion(propertyId: string, token: string) {
   let axiosInstance = axios.create({
     headers: { Authorization: `bearer ${token}` },

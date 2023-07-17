@@ -1,5 +1,5 @@
 import { Router } from "express";
-import {
+import getInterestedClientsByAgentId, {
   clientCreation,
   clientLogin,
   getClientInfo,
@@ -11,6 +11,7 @@ import tokenAuthorizer from "../middlewares/tokenAuthorizer";
 
 const clientRouter = Router();
 
+clientRouter.get("/interestedByAgentId", getInterestedClientsByAgentId);
 clientRouter.get("/search", getClientInfo);
 clientRouter.post("/", clientCreation);
 clientRouter.post("/login", clientLogin);

@@ -2,6 +2,7 @@ import CryptoJS from "crypto-js";
 import jwt from "jsonwebtoken";
 import Client from "../models/Client";
 import { NextFunction, Request, Response } from "express";
+import Property from "../models/Property";
 
 const JWT_KEY = process.env.JWT_KEY || "key";
 
@@ -126,6 +127,36 @@ export async function getClientInfo(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { password, _id, ...clientInfo } = client.toObject();
   res.status(200).json({ ...clientInfo, clientId: _id });
+}
+
+export default async function getInterestedClientsByAgentId(
+  req: Request,
+  res: Response
+) {
+  if (!req.query.agentId) {
+    res.status(400).send();
+    return;
+  }
+  const properties = await Property.find({ agentId: req.query.agentId });
+  if (!properties) {
+    res.status(40).json({ error: "PROPERTY NOT FOUND" });
+    return;
+  }
+  const interestedIds = properties
+    .map((property) => property.toObject().interested)
+    .reduce((state, groupId) => [...state, ...groupId], []);
+  if (!interestedIds) {
+    res.status(400).send();
+    return;
+  }
+  const clients = await Promise.all(
+    interestedIds.map(async (clientId) => {
+      const client = await Client.findById(clientId);
+      if (!client) return null;
+      return client.toObject();
+    })
+  );
+  res.status(200).json({ clients });
 }
 
 type UpdateClientReq = Request & {

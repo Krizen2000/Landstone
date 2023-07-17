@@ -1,0 +1,21 @@
+import axios, { AxiosError, AxiosResponse } from "axios";
+import { NextRequest, NextResponse } from "next/server";
+
+export async function GET(request: NextRequest) {
+  const axiosInstance = axios.create({
+    baseURL: process.env.NEXT_BACKEND_SERVER_URL,
+  });
+  const searchParams = request.nextUrl.searchParams;
+  let agentId = searchParams.get("agentId");
+
+  let res: AxiosResponse;
+  try {
+    res = await axiosInstance.get(`/api/clients/interestedByAgentId?agentId=${agentId}`);
+  } catch (error) {
+    const err = error as AxiosError;
+    return NextResponse.json(err.response?.data, {
+      status: err.response?.status,
+    });
+  }
+  return NextResponse.json(res.data, { status: res.status });
+}

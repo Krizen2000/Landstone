@@ -43,6 +43,7 @@ async function requestProperties(agentId: string): Promise<Properties | null> {
   return res.data.properties;
 }
 
+
 export default function Dashboard() {
   const agentId = useAppSelector((state) => state.personalInfo.agentId);
   const [selectedSection, setSelectedSection] = useState("visitors");
