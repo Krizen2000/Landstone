@@ -1,6 +1,8 @@
+import { config } from "dotenv";
 import Property from "../models/Property";
 import { NextFunction, Request, Response } from "express";
 
+config();
 const DISABLE_CHECKS = process.env.DISABLE_CHECKS?.toLowerCase() === "true";
 
 type PropertyType = {
@@ -40,16 +42,15 @@ export async function propertyCreation(
   res: Response
 ) {
   if (
-    !isPropertyType(req.body) ||
-    !req.user.agentId ||
-    (!req.body.name && !DISABLE_CHECKS)
+    (!isPropertyType(req.body) || !req.user.agentId || !req.body.name) &&
+    !DISABLE_CHECKS
   ) {
     res.status(400).send();
     return;
   }
 
   // * DISABLE BEFORE ADDING TEST VALUES
-  if (DISABLE_CHECKS) {
+  if (!DISABLE_CHECKS) {
     const matchProperty = await Property.findOne({
       name: req.user.agentId.toLowerCase(),
     });
